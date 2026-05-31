@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>xu-41 · 61专属</title>
+    <style>
+        * {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f5f2f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, 'Inter', 'Segoe UI', 'Helvetica Neue', Helvetica, sans-serif;
+            padding: 24px;
+            margin: 0;
+        }
+
+        .game-wrapper {
+            max-width: 520px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 24px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
+            border: 0.5px solid #efebe9;
+        }
+
+        .game-panel {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 0;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: #fefaf8;
+            border-radius: 24px;
+            box-shadow: none;
+            cursor: pointer;
+            width: 100%;
+            height: auto;
+            touch-action: manipulation;
+            border: 0.5px solid #f0eae6;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 24px 8px 16px 8px;
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            color: #7a6a62;
+            font-weight: 450;
+            letter-spacing: -0.2px;
+            font-size: 0.9rem;
+            border: none;
+        }
+
+        .catch-count {
+            background: #fefaf8;
+            color: #b35d7a;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-size: 1.7rem;
+            font-weight: 480;
+            font-family: -apple-system, 'Inter', monospace;
+            box-shadow: none;
+            min-width: 80px;
+            text-align: center;
+            border: 0.5px solid #f0e0d8;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin: 20px 8px 16px 8px;
+        }
+
+        button {
+            background: #ffffff;
+            border: 0.5px solid #e6dbd5;
+            border-radius: 48px;
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            font-weight: 470;
+            font-family: inherit;
+            color: #8b6e60;
+            box-shadow: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            letter-spacing: 0.2px;
+        }
+
+        button:active {
+            transform: scale(0.97);
+            background: #fefaf8;
+            border-color: #dccfc8;
+        }
+
+        .message-area {
+            background: #fefaf8;
+            border-radius: 24px;
+            padding: 14px 18px;
+            margin: 12px 8px;
+            font-size: 0.85rem;
+            text-align: center;
+            font-weight: 420;
+            color: #9b7e6e;
+            border-left: 2px solid #e8dcd5;
+            font-family: inherit;
+            letter-spacing: -0.1px;
+        }
+
+        .gift-code {
+            background: #fefaf8;
+            border-radius: 28px;
+            padding: 12px 16px;
+            margin: 12px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border: 0.5px solid #f0e4de;
+        }
+
+        .code-text {
+            background: #ffffff;
+            color: #b35d7a;
+            font-family: monospace;
+            font-size: 1rem;
+            padding: 8px 16px;
+            border-radius: 40px;
+            letter-spacing: 1px;
+            word-break: break-all;
+            flex: 2;
+            text-align: center;
+            border: 0.5px solid #f0e0d8;
+            font-weight: 460;
+        }
+
+        .copy-btn {
+            background: #ffffff;
+            border: 0.5px solid #e6dbd5;
+            color: #8b6e60;
+            flex: 1;
+            min-width: 80px;
+            font-weight: 450;
+        }
+
+        .copy-btn:active {
+            background: #fefaf8;
+            transform: scale(0.97);
+        }
+
+        footer {
+            font-size: 0.65rem;
+            text-align: center;
+            margin-top: 20px;
+            color: #c2aaa0;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+        }
+
+        /* 弹窗样式 */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .custom-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 32px 28px;
+            max-width: 300px;
+            width: 85%;
+            text-align: center;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+            border: 0.5px solid #f0e4de;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+
+        .custom-modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-emoji {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #b35d7a;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .modal-message {
+            font-size: 0.95rem;
+            color: #8b6e60;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .modal-small-text {
+            font-size: 0.7rem;
+            color: #c2aaa0;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 0.5px solid #f0e4de;
+        }
+
+        .modal-btn {
+            background: #ffffff;
+            border: 0.5px solid #e6dbd5;
+            border-radius: 48px;
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #b35d7a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .modal-btn:active {
+            transform: scale(0.96);
+            background: #fefaf8;
+        }
+
+        @media (max-width: 520px) {
+            .catch-count { font-size: 1.4rem; min-width: 65px; padding: 3px 12px; }
+            .code-text { font-size: 0.8rem; }
+            button { padding: 8px 12px; font-size: 0.8rem; }
+            .stats { font-size: 0.8rem; }
+            .game-wrapper { padding: 18px; }
+            .modal-content { padding: 24px 20px; }
+            .modal-title { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-wrapper">
+    <div class="game-panel">
+        <canvas id="flowerCanvas" width="500" height="400" style="width:100%; height:auto; max-width:500px; aspect-ratio:500/400"></canvas>
+        
+        <div class="stats">
+            <span>收集的小花：</span>
+            <span class="catch-count" id="catchCounter">0</span>
+            <span>目标：6朵 → 解锁616完整花束</span>
+        </div>
+        
+        <div class="btn-group">
+            <button id="resetGameBtn">重新开始</button>
+            <button id="boostSpawnBtn">更多小花</button>
+        </div>
+        
+        <div class="message-area" id="gameMsg">
+            戳戳飘落的花朵，集满6朵解锁616机场完整花束
+        </div>
+        
+        <div class="gift-code" id="giftCodeBox" style="display: none;">
+            <span>花束换码：</span>
+            <div class="code-text" id="redeemCode">——</div>
+            <button class="copy-btn" id="copyCodeBtn">复制</button>
+        </div>
+
+        <footer>
+            集满6朵 → 解锁兑换码，截图发给gsy大王
+        </footer>
+    </div>
+</div>
+
+<!-- 集齐小花庆祝弹窗 -->
+<div class="custom-modal" id="celebrationModal">
+    <div class="modal-content">
+        <div class="modal-emoji">🌸🎀🌸</div>
+        <div class="modal-title">儿童节快乐宝宝</div>
+        <div class="modal-message">很想你 💕<br>6月16日机场见</div>
+        <div class="modal-small-text">📅 倒数日小网站也可以看咯</div>
+        <button class="modal-btn" id="closeModalBtn">收到 💐</button>
+    </div>
+</div>
+
+<script>
+    (function(){
+        const canvas = document.getElementById('flowerCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const TARGET_CATCH = 6;
+        let catchedCount = 0;
+        let flowers = [];
+        let gameActive = true;
+        let spawnInterval = null;
+        let spawnBaseDelay = 1000;
+        let boostMode = false;
+        let redeemCode = '';
+        let hasShownModal = false;
+        
+        // 弹窗元素
+        const celebrationModal = document.getElementById('celebrationModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        
+        function closeCelebrationModal() {
+            celebrationModal.classList.remove('show');
+        }
+        
+        function showCelebrationModal() {
+            if (hasShownModal) return;
+            hasShownModal = true;
+            celebrationModal.classList.add('show');
+        }
+        
+        closeModalBtn.addEventListener('click', closeCelebrationModal);
+        celebrationModal.addEventListener('click', (e) => {
+            if (e.target === celebrationModal) closeCelebrationModal();
+        });
+        
+        function resizeCanvas() {
+            canvas.width = 500;
+            canvas.height = 400;
+            drawGame();
+        }
+        
+        // 花朵类
+        class FlowerSpirit {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 24;
+                this.floatAngle = Math.random() * Math.PI * 2;
+                this.wobble = Math.random() * Math.PI * 2;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.strokeColor = ["#c9aaa0", "#d4b8b0", "#be9e94", "#cbb2a8"][Math.floor(Math.random() * 4)];
+                this.fillColor = ["#faf0ec", "#fef5f2", "#fcf2ee", "#fef0ea"][Math.floor(Math.random() * 4)];
+            }
+            
+            draw(ctx) {
+                ctx.save();
+                const offsetY = Math.sin(Date.now() * 0.005 + this.floatAngle) * 2;
+                const offsetX = Math.cos(Date.now() * 0.004 + this.wobble) * 1;
+                const rot = this.rotation + Math.sin(Date.now() * 0.002) * 0.05;
+                const cx = this.x + offsetX;
+                const cy = this.y + offsetY;
+                ctx.translate(cx, cy);
+                ctx.rotate(rot);
+                ctx.shadowBlur = 0;
+                ctx.lineWidth = 1.2;
+                ctx.strokeStyle = this.strokeColor;
+                ctx.fillStyle = this.fillColor;
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * 72 - 90) * Math.PI / 180;
+                    const px = Math.cos(angle) * 11;
+                    const py = Math.sin(angle) * 11;
+                    ctx.beginPath();
+                    ctx.ellipse(px, py, 5, 8, angle, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+                ctx.beginPath();
+                ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = "#e5c8bc";
+                ctx.fill();
+                ctx.strokeStyle = "#d4b0a4";
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(0, 0, 1, 0, Math.PI * 2);
+                ctx.fillStyle = "#c99a8a";
+                ctx.fill();
+                ctx.restore();
+            }
+            
+            isClicked(mouseX, mouseY) {
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                return (dx*dx + dy*dy) <= this.radius * this.radius;
+            }
+        }
+        
+        function generateFlower() {
+            if(!gameActive) return;
+            if(flowers.length >= 12) return;
+            let x, y, overlap = true;
+            let attempts = 0;
+            while(overlap && attempts < 25) {
+                x = 45 + Math.random() * (canvas.width - 90);
+                y = 60 + Math.random() * (canvas.height - 120);
+                overlap = false;
+                for(let f of flowers) {
+                    const dx = f.x - x;
+                    const dy = f.y - y;
+                    if(Math.sqrt(dx*dx+dy*dy) < 45) {
+                        overlap = true;
+                        break;
+                    }
+                }
+                attempts++;
+            }
+            flowers.push(new FlowerSpirit(x, y));
+            drawGame();
+        }
+        
+        function catchFlower(index) {
+            if(!gameActive) return false;
+            const flower = flowers[index];
+            if(!flower) return false;
+            flowers.splice(index, 1);
+            catchedCount++;
+            updateUI();
+            addPetalEffect(flower.x, flower.y);
+            if(catchedCount >= TARGET_CATCH && !redeemCode) {
+                generateRedeemCode();
+            }
+            drawGame();
+            return true;
+        }
+        
+        function addPetalEffect(x, y) {
+            const msgDiv = document.getElementById('gameMsg');
+            msgDiv.innerHTML = `抓住一朵小花！ +1  共 ${catchedCount}/${TARGET_CATCH}`;
+            setTimeout(() => {
+                if(catchedCount >= TARGET_CATCH) {
+                    msgDiv.innerHTML = `集满${TARGET_CATCH}朵小花！6月16日，gsy会在机场送你一束真的花`;
+                    showCelebrationModal();
+                } else {
+                    msgDiv.innerHTML = `🌸 再集 ${TARGET_CATCH - catchedCount} 朵小花 → 解锁`;
+                }
+            }, 1200);
+        }
+        
+        function generateRedeemCode() {
+            redeemCode = `SNX-616FLOWER`;
+            document.getElementById('redeemCode').innerText = redeemCode;
+            document.getElementById('giftCodeBox').style.display = 'flex';
+            document.getElementById('gameMsg').innerHTML = '已解锁！复制兑换码，6月16日见哦老婆 骑手正在奋力配送中';
+        }
+        
+        function updateUI() {
+            document.getElementById('catchCounter').innerText = catchedCount;
+            if(catchedCount >= TARGET_CATCH && !redeemCode) {
+                generateRedeemCode();
+            }
+        }
+        
+        function resetGame() {
+            flowers = [];
+            catchedCount = 0;
+            redeemCode = '';
+            gameActive = true;
+            hasShownModal = false;
+            document.getElementById('giftCodeBox').style.display = 'none';
+            document.getElementById('gameMsg').innerHTML = '重新开始啦！';
+            updateUI();
+            drawGame();
+            if(spawnInterval) clearInterval(spawnInterval);
+            let delay = boostMode ? 480 : spawnBaseDelay;
+            spawnInterval = setInterval(() => generateFlower(), delay);
+            generateFlower(); generateFlower(); 
+        }
+        
+        function toggleBoost() {
+            boostMode = !boostMode;
+            const newDelay = boostMode ? 450 : spawnBaseDelay;
+            if(spawnInterval) {
+                clearInterval(spawnInterval);
+                spawnInterval = setInterval(() => generateFlower(), newDelay);
+            }
+            const msg = boostMode ? ' quickly！' : '✨ 温柔飘落模式 ✨';
+            document.getElementById('gameMsg').innerHTML = msg;
+            setTimeout(() => {
+                if(catchedCount < TARGET_CATCH)
+                    document.getElementById('gameMsg').innerHTML = `当前收集 ${catchedCount}/${TARGET_CATCH} 朵小花，快戳戳`;
+            }, 1700);
+        }
+        
+        function copyCode() {
+            if(!redeemCode) {
+                document.getElementById('gameMsg').innerHTML = '还没解锁兑换码呢 再收集几朵吧';
+                return;
+            }
+            navigator.clipboard.writeText(redeemCode).then(() => {
+                document.getElementById('gameMsg').innerHTML = `兑换码 ${redeemCode} 已复制！6月16日机场见，花会送到你手里～ `;
+            }).catch(() => {
+                document.getElementById('gameMsg').innerHTML = `📋 手动复制码: ${redeemCode}`;
+            });
+        }
+        
+        function drawGame() {
+            if(!ctx) return;
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "#fefaf8";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "#f0eae6";
+            for(let i=0;i<6;i++) {
+                ctx.fillRect(25 + i*70, 378, 40, 0.6);
+            }
+            for(let f of flowers) {
+                f.draw(ctx);
+            }
+            ctx.font = "400 14px 'Inter', monospace";
+            ctx.fillStyle = "#c2aaa0";
+            ctx.fillText("🐱", 28, 32);
+            ctx.font = "400 10px monospace";
+            ctx.fillStyle = "#d4bbb0";
+            ctx.fillText(`${catchedCount}/${TARGET_CATCH}`, canvas.width-48, 30);
+            if(catchedCount >= TARGET_CATCH) {
+                ctx.font = "400 11px 'Inter'";
+                ctx.fillStyle = "#b35d7a";
+                ctx.fillText("永远都是我的公主小宝宝", canvas.width/2-95, 68);
+            }
+        }
+        
+        function handleCanvasClick(e) {
+            if(!gameActive) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            let clientX, clientY;
+            if(e.touches) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+                e.preventDefault();
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            let canvasX = (clientX - rect.left) * scaleX;
+            let canvasY = (clientY - rect.top) * scaleY;
+            if(canvasX < 0 || canvasX > canvas.width || canvasY < 0 || canvasY > canvas.height) return;
+            for(let i=flowers.length-1; i>=0; i--) {
+                if(flowers[i].isClicked(canvasX, canvasY)) {
+                    catchFlower(i);
+                    break;
+                }
+            }
+            drawGame();
+        }
+        
+        canvas.addEventListener('click', handleCanvasClick);
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            handleCanvasClick({ clientX: touch.clientX, clientY: touch.clientY, touches: e.touches, preventDefault: ()=>{} });
+        });
+        
+        document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+        document.getElementById('boostSpawnBtn').addEventListener('click', toggleBoost);
+        document.getElementById('copyCodeBtn').addEventListener('click', copyCode);
+        
+        resizeCanvas();
+        window.addEventListener('resize', () => { resizeCanvas(); drawGame(); });
+        
+        spawnInterval = setInterval(() => generateFlower(), spawnBaseDelay);
+        generateFlower(); generateFlower(); 
+        animate();
+        updateUI();
+        
+        function animate() {
+            drawGame();
+            requestAnimationFrame(animate);
+        }
+    })();
+</script>
+</body>
+</html>
